@@ -24,9 +24,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private EditText et_text;
     private Button btn_connect, btn_close, btn_send;
     private static final String TAG = "MainActivity";
-    private String domain = "ws://192.168.101.110:8081/websocket/android";
-//    private WebSocketConnection connection = new WebSocketConnection();
-    private StringBuffer text=new StringBuffer();
+    private String domain = AppConstants.ws + "/websocket/android";
+    //    private WebSocketConnection connection = new WebSocketConnection();
+    private StringBuffer text = new StringBuffer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
