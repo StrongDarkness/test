@@ -1,10 +1,6 @@
 package com.example.administrator.test;
 
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -13,11 +9,21 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.administrator.test.adapter.ChatAdapter;
+import com.example.administrator.test.data.model.SocketBean;
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import com.neovisionaries.ws.client.WebSocket;
 import com.neovisionaries.ws.client.WebSocketAdapter;
 import com.neovisionaries.ws.client.WebSocketException;
 import com.neovisionaries.ws.client.WebSocketFrame;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -29,8 +35,12 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
     private LinearLayout ll_content;
     private EditText et_text;
     private Button btn_connect, btn_close, btn_send;
+    private RecyclerView rv_list;
     private static final String TAG = "Main2Activity";
     private String domain = AppConstants.ws + "/websocket/android";
+    private List<SocketBean> msgList = new ArrayList();
+    private ChatAdapter adapter;
+    private Gson gson = new Gson();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -67,12 +77,23 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
         public void onTextMessage(WebSocket websocket, String text) throws Exception {
             super.onTextMessage(websocket, text);
             Log.e(TAG, "onTextMessage: 接收消息：" + text);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    TextView textView = new TextView(Main2Activity.this);
-                    textView.setText(text);
-                    ll_content.addView(textView);
+            runOnUiThread(() -> {
+//                    TextView textView = new TextView(Main2Activity.this);
+//                    textView.setText(text);
+//                    ll_content.addView(textView);
+                try {
+                    SocketBean bean = gson.fromJson(text, SocketBean.class);
+                    if (!bean.getUsername().equals(BaseApplication.currUser.getUsername())) {
+                        bean.setSelf(false);
+                    } else {
+                        bean.setSelf(true);
+                    }
+                    msgList.add(bean);
+                    adapter.notifyDataSetChanged();
+                    rv_list.scrollToPosition(adapter.getItemCount()-1);
+
+                } catch (JsonSyntaxException e) {
+                    e.printStackTrace();
                 }
             });
         }
@@ -81,12 +102,7 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
         public void onConnectError(WebSocket websocket, WebSocketException exception) throws Exception {
             super.onConnectError(websocket, exception);
             Log.e(TAG, "onConnectError: 连接错误", exception);
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    tv_msg.setText("连接错误");
-                }
-            });
+            runOnUiThread(() -> tv_msg.setText("连接错误"));
 
         }
 
@@ -95,12 +111,7 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
             super.onDisconnected(websocket, serverCloseFrame, clientCloseFrame, closedByServer);
             Log.e(TAG, "onDisconnected: 断开连接");
 
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    tv_msg.setText("断开连接");
-                }
-            });
+            runOnUiThread(() -> tv_msg.setText("断开连接"));
         }
 
         @Override
@@ -127,6 +138,12 @@ public class Main2Activity extends AppCompatActivity implements View.OnClickList
         btn_send = findViewById(R.id.btn_send);
         btn_send.setOnClickListener(this);
         ll_content = findViewById(R.id.ll_content);
+        rv_list = findViewById(R.id.rv_list);
+        adapter = new ChatAdapter(this);
+        rv_list.setLayoutManager(new LinearLayoutManager(this));
+        rv_list.setAdapter(adapter);
+        adapter.submitList(msgList);
+        adapter.notifyDataSetChanged();
     }
 
     @Override

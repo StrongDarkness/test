@@ -1,8 +1,8 @@
 package com.example.administrator.test;
 
 import android.app.Dialog;
-import android.content.Context;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.SurfaceView;

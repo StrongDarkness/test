@@ -1,16 +1,12 @@
 package com.example.administrator.test;
 
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
-
-import java.net.URI;
-import java.net.URISyntaxException;
 
 //import io.crossbar.autobahn.websocket.WebSocketConnection;
 //import io.crossbar.autobahn.websocket.WebSocketConnectionHandler;

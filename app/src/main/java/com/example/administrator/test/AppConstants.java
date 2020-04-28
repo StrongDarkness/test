@@ -5,7 +5,7 @@ package com.example.administrator.test;
  */
 public class AppConstants {
 
-    public static String ip = "192.168.1.31";
+    public static String ip = "192.168.1.21";
     public static String port = "8080";
     public static String domain = "http://" + ip + ":" + port;
     public static String ws = "ws://" + ip + ":" + port;
